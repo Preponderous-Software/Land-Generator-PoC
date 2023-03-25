@@ -1,4 +1,4 @@
 # Land-Generator
-This unity asset generates land in the form of a grid of squares.
+This unity asset generates land based on input from the player.
 
-![image](https://user-images.githubusercontent.com/21204351/227100294-fd9c2ad0-0a08-480b-8916-7fa9a47b1075.png)
+![image](https://user-images.githubusercontent.com/21204351/227697786-619f5284-196f-4d60-8a6c-aedbb25c981c.png)
