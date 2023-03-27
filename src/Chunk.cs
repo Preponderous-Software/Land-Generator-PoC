@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Location;
 
+/**
+* A chunk is a 2D array of locations.
+* It is a part of the environment.
+*/
 public class Chunk {
     private int size;
     private Location[,] locations;

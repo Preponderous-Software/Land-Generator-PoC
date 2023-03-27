@@ -4,6 +4,10 @@ using UnityEngine;
 using static Location;
 using static Chunk;
 
+/*
+* An environment is a collection of chunks.
+* It is the world.
+*/
 public class Environment {
     private List<Chunk> chunks = new List<Chunk>();
 

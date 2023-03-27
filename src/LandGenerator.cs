@@ -5,6 +5,10 @@ using static Location;
 using static Chunk;
 using static Environment;
 
+/**
+ * A land generator is a component that generates land.
+ * It is a part of the world.
+ */
 public class LandGenerator : MonoBehaviour {
     public int chunkSize = 16;
     public int locationScale = 10;

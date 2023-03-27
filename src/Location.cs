@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/**
+* A location is a single point in the world.
+* It is a part of a chunk.
+*/
 public class Location {
     private Vector3 position;
     private int scale;
