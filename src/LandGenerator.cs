@@ -2,23 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LandGenerator : MonoBehaviour
-{
-    private int chunkSize = 3;
-    private int locationScale = 10;
+public class LandGenerator : MonoBehaviour {
+    public int chunkSize = 16;
+    public int locationScale = 10;
+
     private Environment environment;
-    
     private int currentChunkX = 0;
     private int currentChunkZ = 0;
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         environment = new Environment(chunkSize, locationScale);
     }
 
     // Update is called once per frame
     void Update() {
+        // change current chunk Z & X upon arrow key press
+        handleInput();
+
+        // check if chunk exists
+        Chunk chunk = environment.getChunk(currentChunkX, currentChunkZ);
+        if (chunk == null) {
+            createNewChunk();
+        }
+    }
+
+    void handleInput() {
         // change current chunk Z & X upon arrow key press
         if (Input.GetKeyDown(KeyCode.UpArrow)) {
             currentChunkZ++;
@@ -29,36 +38,27 @@ public class LandGenerator : MonoBehaviour
         } else if (Input.GetKeyDown(KeyCode.RightArrow)) {
             currentChunkX++;
         }
+    }
 
-        // check if chunk exists
-        Chunk chunk = environment.getChunk(currentChunkX, currentChunkZ);
-        if (chunk == null) {
-            // create new chunk
-            Debug.Log("Creating new chunk at " + currentChunkX + ", " + currentChunkZ);
-            chunk = new Chunk(currentChunkX, currentChunkZ, chunkSize, locationScale);
-            environment.addChunk(chunk);
-        }
+    void createNewChunk() {
+        // create new chunk
+        Debug.Log("Creating new chunk at " + currentChunkX + ", " + currentChunkZ);
+        Chunk chunk = new Chunk(currentChunkX, currentChunkZ, chunkSize, locationScale);
+        environment.addChunk(chunk);
     }
 }
 
 public class Location {
     private Vector3 position;
     private int scale;
+    private string name;
     private GameObject gameObject;
 
     public Location(int xpos, int zpos, int scale) {
         this.position = new Vector3(xpos * scale, 0, zpos * scale);
         this.scale = scale;
-        this.gameObject = new GameObject("Location-" + xpos + "-" + zpos);
-        this.gameObject.transform.position = position;
-        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        cube.transform.parent = gameObject.transform;
-        cube.transform.position = position;
-        cube.transform.localScale = new Vector3(scale, 1, scale);
-
-        // set random color
-        Color color = new Color(Random.value, Random.value, Random.value, 1.0f);
-        cube.GetComponent<Renderer>().material.color = color;
+        this.name = "Location_" + xpos + "_" + zpos;
+        initializeGameObject();
     }
 
     public Vector3 getPosition() {
@@ -72,6 +72,18 @@ public class Location {
     public GameObject getGameObject() {
         return gameObject;
     }
+
+    private void initializeGameObject() {
+        this.gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        this.gameObject.name = name;
+        this.gameObject.transform.position = position;
+        this.gameObject.transform.localScale = new Vector3(scale, 1, scale);
+        setColor(new Color(Random.value, Random.value, Random.value, 1.0f));
+    }
+
+    private void setColor(Color color) {
+        this.gameObject.GetComponent<Renderer>().material.color = color;
+    }
 }
 
 public class Chunk {
@@ -80,6 +92,7 @@ public class Chunk {
     private Vector3 position;
     private int xpos;
     private int zpos;
+    private string name;
     private GameObject gameObject;
 
     public Chunk(int xpos, int zpos, int size, int locationScale) {
@@ -87,15 +100,10 @@ public class Chunk {
         this.locations = new Location[size, size];
         this.xpos = xpos;
         this.zpos = zpos;
+        this.name = "Chunk_" + xpos + "_" + zpos;
         this.position = calculatePosition(locationScale);
-        this.gameObject = new GameObject("Chunk-" + xpos + "-" + zpos);
-        this.gameObject.transform.position = position;
-        for (int x = 0; x < size; x++) {
-            for (int z = 0; z < size; z++) {
-                locations[x, z] = new Location(xpos*size+ x, zpos*size + z, locationScale);
-                locations[x, z].getGameObject().transform.parent = gameObject.transform;
-            }
-        }
+        initializeGameObject();
+        generateLocations(locationScale);
     }
 
     public int getSize() {
@@ -124,6 +132,20 @@ public class Chunk {
 
     private Vector3 calculatePosition(int locationScale) {
         return new Vector3(xpos * size * locationScale, 0, zpos * size * locationScale);
+    }
+
+    private void initializeGameObject() {
+        this.gameObject = new GameObject(name);
+        this.gameObject.transform.position = position;
+    }
+
+    private void generateLocations(int locationScale) {
+        for (int x = 0; x < size; x++) {
+            for (int z = 0; z < size; z++) {
+                locations[x, z] = new Location(xpos * size + x, zpos * size + z, locationScale);
+                locations[x, z].getGameObject().transform.parent = gameObject.transform;
+            }
+        }
     }
 }
 
